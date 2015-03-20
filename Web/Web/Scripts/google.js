@@ -62,6 +62,42 @@
         google.maps.event.addListener(marker, 'click', function () {
             info.open(map, marker);
         });
+    },
+    //typeahead
+    initializeTypeAhead = function () {
+        var domains = new Bloodhound({
+            limit: 10,
+            datumTokenizer: function (datum) {
+                return Bloodhound.tokenizers.whitespace(datum.value);
+            },
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: opt.urlGetDomains + '?nameContains=%QUERY',
+                filter: function (domains) {
+                    return $.map(domains.Domains, function (domain) {
+                        return {
+                            value: domain.Name,
+                            key: domain.Id
+                        };
+                    });
+                }
+            }
+        });
+
+        domains.initialize();
+
+        // Instantiate the Typeahead UI
+        var typeAhead = opt.addDomain.typeahead({
+            autoselect: true,
+            minLength: 3
+        }, {
+            displayKey: 'value',
+            source: domains.ttAdapter()
+        });
+        typeAhead.on('typeahead:selected', function (evt, data) {
+            NewDomain(data.value);
+            prov.addProviderDomain(data.key);
+        });
     }
 
     return {

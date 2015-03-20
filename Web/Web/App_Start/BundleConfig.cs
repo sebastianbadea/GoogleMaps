@@ -20,6 +20,10 @@ namespace Web
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+            bundles.Add(new ScriptBundle("~/bundles/jsTypeahead").Include(
+                      "~/Scripts/typeahead.bundle.js"));
+            bundles.Add(new StyleBundle("~/content/cssTypeahead").Include(
+                      "~/Content/typeahead.css"));
             bundles.Add(new ScriptBundle("~/bundles/maps").Include(
                       "~/Scripts/google.js"));
         }
