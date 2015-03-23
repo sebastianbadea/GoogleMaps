@@ -1,6 +1,7 @@
 ﻿var maps = function () {
     var
     opt = null,
+    map = null,
     markers = [],
     setOptions = function (options) {
         opt = options;
@@ -22,19 +23,22 @@
     },
     mapClick = function (map) {
         google.maps.event.addListener(map, 'rightclick', function (event) {
-            setAllMap(null);
-            drawMarker(map,
-                {
-                    title: "selected item",
-                    description: "selected item",
-                    location: { lat: event.latLng.lat(), lng: event.latLng.lng() }
-                }
-            );
-            showCoords(event.latLng);
+            setMarkerLocation(event.latLng.lat(), event.latLng.lng());
         });
     },
-    showCoords = function (location) {
-        opt.divCoords.html('lat: ' + location.lat() + '/long: ' + location.lng());
+    setMarkerLocation = function (lat, lng) {
+        setAllMap(null);
+        drawMarker(map,
+            {
+                title: opt.title.val(),
+                description: opt.details.val(),
+                location: { lat: lat, lng: lng }
+            }
+        );
+        showCoords(lat, lng);
+    },
+    showCoords = function (lat, lng) {
+        opt.divCoords.html('lat: ' + lat + '/long: ' + lng);
     },
     setAllMap = function(map) {
         for (var i = 0; i < markers.length; i++) {
@@ -65,43 +69,45 @@
     },
     //typeahead
     initializeTypeAhead = function () {
-        var domains = new Bloodhound({
+        var locations = new Bloodhound({
             limit: 10,
             datumTokenizer: function (datum) {
                 return Bloodhound.tokenizers.whitespace(datum.value);
             },
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
-                url: opt.urlGetDomains + '?nameContains=%QUERY',
-                filter: function (domains) {
-                    return $.map(domains.Domains, function (domain) {
+                url: "https://maps.googleapis.com/maps/api/geocode/json?address=%QUERY",
+                filter: function (locations) {
+                    return $.map(locations.results, function (location) {
                         return {
-                            value: domain.Name,
-                            key: domain.Id
+                            value: location.formatted_address,
+                            geolat: location.geometry.location.lat,
+                            geolong: location.geometry.location.lng
                         };
                     });
                 }
             }
         });
 
-        domains.initialize();
+        locations.initialize();
 
-        // Instantiate the Typeahead UI
-        var typeAhead = opt.addDomain.typeahead({
+        var typeAhead = opt.street.typeahead({
             autoselect: true,
             minLength: 3
         }, {
             displayKey: 'value',
-            source: domains.ttAdapter()
+            source: locations.ttAdapter()
         });
         typeAhead.on('typeahead:selected', function (evt, data) {
-            NewDomain(data.value);
-            prov.addProviderDomain(data.key);
+            var latLng = new google.maps.LatLng(data.geolat, data.geolong);
+            map.setCenter(latLng);
+            setMarkerLocation(data.geolat, data.geolong);
         });
     }
 
     return {
         initialize: initialize,
+        initializeTypeAhead: initializeTypeAhead,
         setOptions: setOptions
     };
 }();
@@ -110,6 +116,9 @@ $(function () {
     var descUnirii = '<p><b>Piața Unirii</b> (<small>Romanian pronunciation:&nbsp;</small><span title="Representation in the International Phonetic Alphabet (IPA)" class="IPA"><a href="http://en.wikipedia.org/wiki/Help:IPA_for_Romanian" title="Help:IPA for Romanian">[ˈpjat͡sa uˈnirij]</a></span>; <i>Unification Square</i> or <i>Union Square</i> in English) is one of the largest squares in central <a href="http://en.wikipedia.org/wiki/Bucharest" title="Bucharest">Bucharest</a>, located in the center of the city where Sectors 1, 2, 3, and 4 meet. </p>';
     var descVictoriei = '<p><b>Victory Square</b> (<a href="http://en.wikipedia.org/wiki/Romanian_language" title="Romanian language">Romanian</a>: <span lang="ro" xml:lang="ro"><i>Piaţa Victoriei</i></span>) is a major intersection in central <a href="http://en.wikipedia.org/wiki/Bucharest" title="Bucharest">Bucharest</a>. It is known for its proximity to major office towers and government buildings.</p>';
     var opt = {
+        street: $("#street"),
+        title: $("#title"),
+        details: $("#details"),
         divMap: $('#divMap')[0],
         divCoords: $('#divCoords'),
         markers:
@@ -119,4 +128,5 @@ $(function () {
     maps.setOptions(opt);
     //maps.initialize();
     google.maps.event.addDomListener(window, 'load', maps.initialize);
+    maps.initializeTypeAhead();
 });

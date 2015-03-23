@@ -1,12 +1,30 @@
 ﻿@{
     ViewBag.Title = "Maps";
 }
-<div class="row">
-    <div id="divMap" style="height: 500px;" class="col-md-6 col-md-offset-3" />
+@Styles.Render("~/content/cssTypeahead")
+<div class="col-md-6">
+    <div class="form-group">
+        <label for="street">Street</label><br />
+        <input type="text" id="street" class="typeahead form-control" />
+    </div>
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="details">Details</label>
+        <textarea id="details" class="form-control" rows="5"></textarea>
+    </div>
+    <div id="divCoords">
+    </div>
+
 </div>
-<div class="row">
-    <div id="divCoords" class="col-md-6 col-md-offset-3" />
+<div class="col-md-6">
+    <div id="divMap" style="height: 500px; "></div>
+</div>
+
 </div>
 @section scripts{
     @Scripts.Render("~/bundles/maps")
+    @Scripts.Render("~/bundles/jsTypeahead")
 }
