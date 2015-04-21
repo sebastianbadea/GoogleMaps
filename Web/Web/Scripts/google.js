@@ -7,7 +7,7 @@
         opt = options;
     },
 
-    initialize = function () {
+    initializeMap = function () {
         var mapOptions = {
             center: new google.maps.LatLng(44.440521, 26.118622),
             zoom: 12,
@@ -44,7 +44,7 @@
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
         }
-    }
+    },
     drawMarkers = function (map) {
         $.each(opt.markers, function (key, value) {
             drawMarker(map, value);
@@ -68,7 +68,7 @@
         });
     },
     //typeahead
-    initializeTypeAhead = function () {
+    initializeTypeAheadMap = function () {
         var locations = new Bloodhound({
             limit: 10,
             datumTokenizer: function (datum) {
@@ -106,8 +106,8 @@
     }
 
     return {
-        initialize: initialize,
-        initializeTypeAhead: initializeTypeAhead,
+        initializeMap: initializeMap,
+        initializeTypeAheadMap: initializeTypeAheadMap,
         setOptions: setOptions
     };
 }();
@@ -126,7 +126,7 @@ $(function () {
              { title: "Victoriei square", description: descVictoriei, location: { lat: 44.453749, lng: 26.091821 } }]
     };
     maps.setOptions(opt);
-    //maps.initialize();
-    google.maps.event.addDomListener(window, 'load', maps.initialize);
-    maps.initializeTypeAhead();
+    //maps.initializeMap();
+    google.maps.event.addDomListener(window, 'load', maps.initializeMap);
+    maps.initializeTypeAheadMap();
 });

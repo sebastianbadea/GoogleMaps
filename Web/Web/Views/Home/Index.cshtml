@@ -2,7 +2,7 @@
     ViewBag.Title = "Maps";
 }
 @Styles.Render("~/content/cssTypeahead")
-<div class="col-md-6">
+<div class="col-md-4 col-xs-10">
     <div class="form-group">
         <label for="street">Street</label><br />
         <input type="text" id="street" class="typeahead form-control" />
@@ -19,10 +19,8 @@
     </div>
 
 </div>
-<div class="col-md-6">
+<div class="col-md-8 col-xs-10">
     <div id="divMap" style="height: 500px; "></div>
-</div>
-
 </div>
 @section scripts{
     @Scripts.Render("~/bundles/maps")
