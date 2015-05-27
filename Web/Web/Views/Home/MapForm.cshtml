@@ -1,0 +1,90 @@
+﻿<div class="col-md-4">
+    <div id="ctlDirections">
+        <div class="form-group">
+            <input type="text" id="from" placeholder="from" class="form-control" />
+        </div>
+        <div class="form-group">
+            <div class="col-md-10 noPadding">
+                <input type="text" id="to" placeholder="to" class="form-control" />
+            </div>
+            <input type="button" id="add" value="+" class="btn btn-success" />
+        </div>
+        <div class="form-group">
+            <button type="submit" id="getDirection" class="btn btn-primary">Get direction</button>
+        </div>
+    </div>
+</div>
+<div id="divMap" class="mapDivStyle"></div>
+@section scripts{
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+    <script type="text/javascript">
+        var maps = function () {
+            var
+                map, fromComplete, toComplete, gFrom, gTo,
+                directionsDisplay, directionsService,
+                mapOptions = {
+                    center: new google.maps.LatLng(7.28619, 80.59021),
+                    zoom: 8,
+                    disableDefaultUI: true
+                },
+                initializeMap = function (opt) {
+                    map = new google.maps.Map(opt.mapDiv, mapOptions);
+                    //add controls to map
+                    map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById("ctlDirections"));
+                    //add places autocomplete
+                    fromComplete = new google.maps.places.Autocomplete(opt.from, {});
+                    toComplete = new google.maps.places.Autocomplete(opt.to, {});
+                    //add listerners onChange for from and to to get the geometry, so that we can use it in direction
+                    google.maps.event.addListener(fromComplete, 'place_changed', setGeometryFrom);
+                    google.maps.event.addListener(toComplete, 'place_changed', setGeometryTo);
+                    //initialize the direction service; used for calling
+                    directionsService = new google.maps.DirectionsService();
+                    //initialize the directions display
+                    directionsDisplay = new google.maps.DirectionsRenderer();
+                    directionsDisplay.setMap(map);
+                },
+                setGeometryFrom = function () {
+                    var place = fromComplete.getPlace();
+                    if (place.geometry) {
+                        gFrom = place.geometry.location;
+                    }
+                },
+                setGeometryTo = function () {
+                    var place = toComplete.getPlace();
+                    if (place.geometry) {
+                        gTo = place.geometry.location;
+                    }
+                },
+                getDirection = function () {
+                    var request = {
+                        origin: gFrom,
+                        destination: gTo,
+                        travelMode: google.maps.TravelMode.DRIVING
+                    };
+                    directionsService.route(request, function (result, status) {
+                        if (status == google.maps.DirectionsStatus.OK) {
+                            directionsDisplay.setDirections(result);
+                        } else {
+                            alert(status);
+                        }
+                    });
+                }
+
+            return {
+                initializeMap: initializeMap,
+                getDirection: getDirection
+            };
+        }();
+
+        $(function () {
+            var opt = {
+                mapDiv: document.getElementById("divMap"),
+                from: document.getElementById("from"),
+                to: document.getElementById("to"),
+                getDirection: document.getElementById("getDirection")
+            };
+            var map = maps.initializeMap(opt);
+            $("#getDirection").click(maps.getDirection);
+        });
+    </script>
+}

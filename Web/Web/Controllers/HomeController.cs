@@ -13,5 +13,10 @@ namespace Web.Controllers
         {
             return View();
         }
+
+        public ActionResult MapForm() 
+        {
+            return View();
+        }
     }
 }

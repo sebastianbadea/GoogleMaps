@@ -147,6 +147,7 @@
   <ItemGroup>
     <None Include="Properties\PublishProfiles\maps.pubxml" />
     <Content Include="Views\Home\TestResponsive.cshtml" />
+    <Content Include="Views\Home\MapForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
